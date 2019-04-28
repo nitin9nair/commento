@@ -1,0 +1,89 @@
+<!-- navignation bar template -->
+<nav class="nav-bar">
+  <h3>Commento</h3>
+</nav>
+<div class="container">
+  <div class="comment-form">
+    <!-- using Template Driven forms to get values for the comment -->
+    <form (ngSubmit)="f.valid && postComment(f)" #f="ngForm">
+      <!-- using input field to get the name of the author -->
+      <input
+        type="text"
+        name="authorName"
+        class="form-text form-control"
+        ref="authorName"
+        #authorName="ngModel"
+        minlength="3"
+        ngModel
+        placeholder="Enter Username"
+        pattern="([A-Za-z]+)"
+        required
+      />
+      <!-- error message to show when author name is invalid or incorrect -->
+      <span
+        class="notification-message error-message"
+        *ngIf="authorName.touched && authorName.invalid"
+      >
+        Author Name is invalid (no number, spaces and special characters allowed) and
+        must be atleast 3 characters long
+      </span>
+
+      <!-- success message to show when author comment is invalid or incorrect -->
+      <span
+        class="notification-message success-message"
+        *ngIf="authorName.touched && authorName.valid"
+      >
+        Author Name is correct
+      </span>
+
+      <!-- using textare to get the comment value -->
+      <textarea
+        class="form-textarea form-control"
+        rows="10"
+        placeholder="Comment"
+        ref="authorComment"
+        #authorComment="ngModel"
+        required
+        name="authorComment"
+        minlength="3"
+        ngModel
+        placeholder="Enter Comment"
+      ></textarea>
+
+      <!-- error message to show when author comment is invalid or incorrect -->
+      <span
+        class="notification-message error-message"
+        *ngIf="authorComment.touched && authorComment.invalid"
+      >
+        Comment field value cannot be empty (atleast 3 characters required)
+      </span>
+
+      <!-- success message to show when author comment is valid or correct -->
+      <span
+        class="notification-message success-message"
+        *ngIf="authorComment.touched && authorComment.valid"
+      >
+        Comment field value is correct
+      </span>
+
+      <!-- disabling form submit button until form is not valid -->
+      <button type="submit" class="btn btn-submit" [disabled]="!f.valid">
+        Post Comment
+      </button>
+    </form>
+
+    <!-- button to clear/reset the form -->
+    <button class="btn btn-clear" (click)="onClearForm(f)">
+      Clear
+    </button>
+  </div>
+
+  <!-- template to render each and every comment form the commentList -->
+  <div class="comment-container">
+    <app-comment
+      [parentId]="0"
+      [commentList]="commentListLocalStorage"
+      (commentValueUpdate)="getUpdatedComment($event)"
+    ></app-comment>
+  </div>
+</div>

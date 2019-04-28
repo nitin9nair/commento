@@ -1,0 +1,125 @@
+<!-- template to render the comment list -->
+
+<!-- iterating comments from the fetched list  -->
+<ul class="cList" *ngFor="let comment of commentList">
+  <li *ngIf="comment.parentId == parentId">
+    <div class="comment-box">
+      <!-- display author comment -->
+      <div class="comment-text">{{ comment.comment }}</div>
+      <div class="box-footer">
+        <!-- reply button -->
+        <div class="reply-section" *ngIf="comment.level < 2">
+          <button class="no-btn" (click)="openReplyForm(comment.commentId)">
+            <i class="fa fa-reply fa-icon"></i>
+            Reply
+          </button>
+        </div>
+
+        <!-- date posted section -->
+        <div class="time-section">
+          <i class="fa fa-history fa-icon"></i>
+          {{ comment.datePosted }}
+        </div>
+
+        <!-- author name display section -->
+        <div class="author-section">
+          <i class="fa fa-user fa-icon"></i>
+          {{ comment.author }}
+        </div>
+      </div>
+    </div>
+
+    <!-- template to render the reply comment form post clicking on reply button of a particular comment -->
+    <div
+      class="comment-form reply-form"
+      *ngIf="replyCommentFlag == comment.commentId"
+    >
+      <!-- Using Template Driven forms in Angular to get reply comments -->
+      <form
+        (ngSubmit)="
+          f.valid &&
+            postReplyComment(f, comment.level, comment.commentId, commentList)
+        "
+        #f="ngForm"
+      >
+        <input
+          type="text"
+          name="replyAuthorName"
+          class="form-text form-control"
+          placeholder="Enter Name"
+          ref="username"
+          #replyAuthorName="ngModel"
+          minlength="3"
+          ngModel
+          placeholder="Enter Username"
+          pattern="([A-Za-z]+)"
+          required
+        />
+
+        <!-- error message to show when reply author name is invalid or incorrect -->
+        <span
+          class="notification-message error-message"
+          *ngIf="replyAuthorName.touched && replyAuthorName.invalid"
+        >
+          Reply Author Name is invalid (no number, spaces and special characters
+          allowed) and must be atleast 3 characters long
+        </span>
+        <!-- success message to show when reply author name is valid or correct -->
+        <span
+          class="notification-message success-message"
+          *ngIf="replyAuthorName.touched && replyAuthorName.valid"
+        >
+          Reply Author Name is correct
+        </span>
+
+        <!-- using textarea to get reply comment -->
+        <textarea
+          class="form-textarea form-control"
+          rows="3"
+          placeholder="Reply Comment"
+          name="replyAuthorComment"
+          ref="replyAuthorComment"
+          #replyAuthorComment="ngModel"
+          minlength="3"
+          ngModel
+          placeholder="Enter Reply Comment"
+          required
+        ></textarea>
+
+        <!-- error message to show when reply author comment is invalid or incorrect -->
+        <span
+          class="notification-message error-message"
+          *ngIf="replyAuthorComment.touched && replyAuthorComment.invalid"
+        >
+          Reply Comment field value cannot be empty (atleast 3 characters
+          required)
+        </span>
+
+        <!-- success message to show when reply author comment is valid or correct -->
+        <span
+          class="notification-message success-message"
+          *ngIf="replyAuthorComment.touched && replyAuthorComment.valid"
+        >
+          Reply Comment field value is correct
+        </span>
+
+        <!-- disabling form submit button until form is valid -->
+        <button type="submit" class="btn btn-submit" [disabled]="!f.valid">
+          Post Reply Comment
+        </button>
+      </form>
+
+      <!-- button used to reset/clear the form -->
+      <button class="btn btn-clear" (click)="onClearForm(f)">
+        Clear
+      </button>
+    </div>
+
+    <!-- recursive template to render the list of all comments -->
+    <app-comment
+      [parentId]="comment.commentId"
+      [commentList]="removeSameLevelComments(commentList, comment.parentId)"
+      (commentValueUpdate)="reEmitUpdatedList($event)"
+    ></app-comment>
+  </li>
+</ul>
